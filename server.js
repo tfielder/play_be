@@ -85,27 +85,25 @@ app.get('/api/v1/songs/:id', (request, response) => {
 });
 
 //Update
-// app.put('/api/vi/songs/:id', (request, response) => {
-//   const song = request.body;
-//   const id = parseInt(request.params.id);
-//
-//   let requiredParameter =
-//   // for (let requiredParameter of ['name', 'artist_name', 'genre', 'song_rating']){
-//   for (let param of song){
-//     if (song[requiredParameter]){
-//       return response
-//         .status(422)
-//         .send({ error: `Expected format: { name: <String>, artist_name: <String>, genre: <String>, song_rating: <Integer>}. You're missing a "${requiredParameter}" property.`});
-//     }
-//   }
-//   database('songs').where('id', request.params.id).update(song)
-// //   .then(song => {
-// //     response.status(201).json({ id: song[id] })
-// //   })
-// //   .catch(error => {
-// //     response.status(500).json({ error });
-// //   });
-// });
+app.put('/api/v1/songs/:id', (request, response) => {
+  const song = request.body;
+  const id = parseInt(request.params.id);
+
+  for (let requiredParameter of ['name', 'artist_name', 'genre', 'song_rating']){
+    if (!song[requiredParameter]){
+      return response
+        .status(422)
+        .send({ error: `Expected format: { name: <String>, artist_name: <String>, genre: <String>, song_rating: <Integer>}. You're missing a "${requiredParameter}" property.`});
+    }
+  }
+  database('songs').where('id', request.params.id).update(request.body)
+    .then(song => {
+      response.status(200).json({ song: song[id] })
+    })
+    .catch(error => {
+      response.status(500).json({ error });
+    });
+});
 
 
 app.listen(app.get('port'), () => {
