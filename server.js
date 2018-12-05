@@ -40,9 +40,9 @@ app.post('/api/v1/songs', (request, response) => {
 });
 
 //Read
-app.get('/api/v1/songs', (request, response) => {
+app.get('/api/v1/favorites', (request, response) => {
 
-  database('songs').select('name', 'artist_name', 'genre', 'song_rating')
+  database('songs').select('id', 'name', 'artist_name', 'genre', 'song_rating')
     .then((songs) => {
       response.status(200).json(songs);
     })
@@ -81,7 +81,7 @@ app.put('/api/v1/songs/:id', (request, response) => {
   }
   database('songs').where('id', request.params.id).update(request.body)
     .then(song => {
-      response.status(200).json({ song: song[id] })
+      response.status(200).json({ "song": song[id] })
     })
     .catch(error => {
       response.status(500).json({ error });
