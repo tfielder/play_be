@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-// import pry from 'pryjs'
 const pry = require('pryjs')
 
 const environment = process.env.NODE_ENV || 'development';
