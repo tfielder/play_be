@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+// import pry from 'pryjs'
+const pry = require('pryjs')
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
@@ -38,8 +40,25 @@ app.post('/api/v1/songs', (request, response) => {
     });
 });
 
+/* Destroy */
+app.delete('/api/v1/songs/:id', (request, response) => {
+  const song = database('songs').where('id', request.params.id).select();
+  if (song) {
+    database('songs').where('id', request.params.id).del()
+      .then(song => {
+        response.status(204);
+      })
+      .catch(error => {
+        response.status(500).json({ error });
+      })
+  } else {
+    response.status(404).send({ error: `Could not find song with id ${request.params.id}` });
+  }
+ });
+
 //Read
 app.get('/api/v1/songs', (request, response) => {
+
   database('songs').select('name', 'artist_name', 'genre', 'song_rating')
     .then((songs) => {
       response.status(200).json(songs);
@@ -66,45 +85,28 @@ app.get('/api/v1/songs/:id', (request, response) => {
 });
 
 //Update
-// app.patch('/api/vi/songs/:id', (request, response) => {
+// app.put('/api/vi/songs/:id', (request, response) => {
 //   const song = request.body;
 //   const id = parseInt(request.params.id);
 //
-//   for (let requiredParameter of ['name', 'artist_name', 'genre', 'song_rating']){
-//     if (!song[requiredParameter]){
+//   let requiredParameter =
+//   // for (let requiredParameter of ['name', 'artist_name', 'genre', 'song_rating']){
+//   for (let param of song){
+//     if (song[requiredParameter]){
 //       return response
 //         .status(422)
 //         .send({ error: `Expected format: { name: <String>, artist_name: <String>, genre: <String>, song_rating: <Integer>}. You're missing a "${requiredParameter}" property.`});
 //     }
 //   }
-//
-//   database('songs').insert(song, 'id')
-//   .then(song => {
-//     response.status(201).json({ id: song[id] })
-//   })
-//   .catch(error => {
-//     response.status(500).json({ error });
-//   });
+//   database('songs').where('id', request.params.id).update(song)
+// //   .then(song => {
+// //     response.status(201).json({ id: song[id] })
+// //   })
+// //   .catch(error => {
+// //     response.status(500).json({ error });
+// //   });
 // });
 
-
-//Destroy
-// app.delete('/api/vi/songs/:id', (request, response) => {
-//   database('songs').where('id', request.params.id).select()
-//   .then(song => {
-//     if (song.length) {
-//       database('songs').where('id', request.params.id).del();
-//       response.status(204).json(`Successfully deleted song with id: ${request.params.id}.`);
-//     } else {
-//       response.status(404).json({
-//         error: `Could not find song with id ${request.params.id}`
-//       });
-//     }
-//   })
-//   .catch(error => {
-//     response.status(500).json({ error });
-//   });
-// });
 
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on ${app.get('port')}.`);
